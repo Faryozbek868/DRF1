@@ -1,40 +1,39 @@
-import React, { use } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Style/home.css';
 
 function Home() {
-
   const [project, setProject] = useState([]);
-  const [loading, setloading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-      fetch('http://127.0.0.1:8000/api/news/')
-      .then(response => {
-          if (!response.ok) {
-              setError('Backenddan xatolik yuz berdi');
-          }
-          console.log(response);
-
-          return response.json();
+    fetch('http://127.0.0.1:8000/api/news/')
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Backenddan xatolik yuz berdi');
+        }
+        return response.json();
       })
-      .then(data => {
-          setProject(data);
-          console.log(data);
-          setloading(false); 
+      .then((data) => {
+        setProject(data);
+        setLoading(false);
       })
-      .catch(err => {
-          console.error('Fetch xatosi:', err);
-          setError('Backenddan xatolik yuz berdi');
-          setloading(false);
+      .catch((err) => {
+        console.error('Fetch xatosi:', err);
+        setError('Backenddan xatolik yuz berdi');
+        setLoading(false);
       });
-  }, [])
+  }, []);
 
   if (loading) {
-      <h1>Yuklanmoqda...</h1>;
+    return <h1>Yuklanmoqda...</h1>;
   }
+
   if (error) {
-      return <h1>{error}</h1>;
+    return <h1>{error}</h1>;
   }
+
+
 
   return (
     <div className="home-container">
@@ -212,45 +211,34 @@ function Home() {
         </div>
       </section>
 
-      {/* Blog News Section */}
       <section className="blog-section">
-        <h2>Blog yangiliklarimiz</h2>
-        <div className="blog-grid">
-          <div className="blog-card">
-            <img src="/placeholder.svg?height=200&width=300" alt="Blog post 1" />
-            <h3>«QA» mutaxassisi qanday bo'lishi kerak?</h3>
-            <p>Ma'lumki, «Najot Ta'lim»dagi kurslar qatoriga «QA», ya'ni «Dasturiy ta'minotni testlash» kursi ham qo'shilgan.</p>
-            <div className="blog-meta">
-              <span>#hi_tech</span>
-              <span>📅 14:45</span>
-              <span>22/02/23</span>
-            </div>
-          </div>
-          <div className="blog-card">
-            <img src="/placeholder.svg?height=200&width=300" alt="Blog post 2" />
-            <h3>«Najot Ta'lim» logosi Abstrakt logo hisoblanadi. Bu kabi logolarning ma'nosini bir martada ilg'ash qiyin bo'lishi mumkin.</h3>
-            <div className="blog-meta">
-              <span>#hi_tech</span>
-              <span>📅 14:45</span>
-              <span>22/02/23</span>
-            </div>
-          </div>
-          <div className="blog-card">
-            <img src="/placeholder.svg?height=200&width=300" alt="Blog post 3" />
-            <h3>«TechJobs» kompaniyasi Java dasturchilarni maxsus «Deep interview»ga taklif qiladi!</h3>
-            <p>Intervyuda sizning o'z sohangizdagi bo'shliqlaringiz, kamchiliklaringiz aniqlanib...</p>
-            <div className="blog-meta">
-              <span>#hi_tech #apple</span>
-              <span>📅 14:45</span>
-              <span>22/02/23</span>
-            </div>
+  <h2>Blog yangiliklarimiz</h2>
+  <div className="blog-grid">
+    {project.length > 0 ? (
+      project.map((item) => (
+        <div className="blog-card" key={item.id}>
+          <img
+            src={item.image || "/placeholder.svg?height=200&width=300"}
+            alt={item.title}
+          />
+          <h3>{item.title}</h3>
+          <p>{item.description}</p>
+          <div className="blog-meta">
+            <span>{item.category || "#yangilik"}</span>
+            <span>📅 {item.time || "00:00"}</span>
+            <span>{item.date || "00/00/00"}</span>
           </div>
         </div>
-        <div className="carousel-nav">
-          <button className="nav-arrow left-arrow">{'<'}</button>
-          <button className="nav-arrow right-arrow">{'>'}</button>
-        </div>
-      </section>
+      ))
+    ) : (
+      <p>Yangiliklar mavjud emas.</p>
+    )}
+  </div>
+  <div className="carousel-nav">
+    <button className="nav-arrow left-arrow">{'<'}</button>
+    <button className="nav-arrow right-arrow">{'>'}</button>
+  </div>
+</section>
 
       {/* Our Team Section */}
       <section className="team-section">
